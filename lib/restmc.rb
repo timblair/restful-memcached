@@ -49,7 +49,9 @@ module RESTmc
     private
 
     def splat_to_key(splat)
-      splat.first.split(/\//).join(':')
+      key = splat.first.split(/\//).join(':')
+      halt 404 if key.length == 0 || /\s/ =~ key
+      key
     end
 
     def get_ttl

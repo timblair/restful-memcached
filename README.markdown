@@ -4,11 +4,11 @@ RESTful memcached (RESTmc) is a simple Sinatra app that provides a REST interfac
 
 ## Usage
 
-Start the app:
+Start the app using [Shotgun](http://github.com/rtomayko/shotgun) (or `rackup` if you prefer):
 
-	ruby restmc.rb
+	shotgun config.ru
 
-This will start a webserver running on `localhost:4567` talking to a memcached instance on `localhost:11211` which maps the following HTTP request types to memcached commands:
+This will start a webserver running on `localhost:9393` talking to a memcached instance on `localhost:11211` which maps the following HTTP request types to memcached commands:
 
 	GET    -> get
 	POST   -> add
@@ -23,10 +23,10 @@ Both `POST` and `PUT` use the request body as the value to store.
 
 ### Example curl Commands
 
-	curl -X GET http://localhost:4567/path_to_key
-	curl -X POST -d "value" http://localhost:4567/path_to_key
-	curl -X PUT -d "value" http://localhost:4567/path_to_key
-	curl -X DELETE http://localhost:4567/path_to_key
+	curl -X GET http://localhost:9393/path_to_key
+	curl -X POST -d "value" http://localhost:9393/path_to_key
+	curl -X PUT -d "value" http://localhost:9393/path_to_key
+	curl -X DELETE http://localhost:9393/path_to_key
 
 ### Return Values
 
@@ -38,6 +38,13 @@ You can specify keys either by exact name, or can make use of the auto-namespaci
 
 	GET /path_to_key -> path_to_key
 	GET /path/to/key -> path:to:key
+
+### Key Expiry
+
+You can set an expiry time for a key when using a `POST` or `PUT` command by using the `Cache-Control` HTTP header to specify a timeout in seconds.  The default is `0` (i.e. never expire).
+
+	curl -X PUT -d "value" -H "Cache-Control: max-age=5" \
+		http://localhost:9393/path_to_key
 
 ## Requirements
 

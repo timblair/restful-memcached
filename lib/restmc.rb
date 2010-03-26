@@ -1,8 +1,18 @@
 require 'rubygems'
 require 'sinatra/base'
 require 'memcached'
+require 'yaml'
 
 module RESTmc
+
+  def self.config
+    begin
+      @config ||= YAML.load_file(File.join(File.dirname(__FILE__), '..', 'config.yml'))[RESTmc::Application.environment.to_s]
+    rescue
+      @config = { 'servers' => ['127.0.0.1:11211'] }
+    end
+  end
+
   class Application < Sinatra::Base
     mime_type :text, 'text/plain'
     set :reload_templates, false  # we have no templates
@@ -11,7 +21,7 @@ module RESTmc
     DEFAULT_TTL = 0  # never expire; use @mc.options[:default_ttl] for the client default of 1 week
 
     def initialize
-      @mc = Memcached.new
+      @mc = Memcached.new RESTmc.config['servers']
     end
 
     before do

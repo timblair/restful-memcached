@@ -12,7 +12,7 @@ This will start a webserver running on `localhost:9393` talking to a memcached i
 
 	GET    -> get
 	POST   -> add
-	PUT    -> set
+	PUT    -> set (also incr/decr)
 	DELETE -> delete
 
 The memcached key is taken from the URL:
@@ -27,6 +27,19 @@ Both `POST` and `PUT` use the request body as the value to store.
 	curl -X POST -d "value" http://localhost:9393/path_to_key
 	curl -X PUT -d "value" http://localhost:9393/path_to_key
 	curl -X DELETE http://localhost:9393/path_to_key
+
+### `incr` and `decr` Commands
+
+The `PUT` verb can also be used to increment and decrement counters (i.e. the `incr` and `decr` memcached commands).  Use of these is as simple as augmenting the key (URL) with a `+` or `-` appropriately.  The amount to increase/decrease the key by is given in the request body; the default is 1 (one) if not provided.  For example:
+
+	curl -X PUT -d "1" http://localhost:9393/%2B/key_to_increment
+	curl -X PUT -d "1" http://localhost:9393/-/key_to_decrement
+
+Please note the use of the URL-encoded form of the `+` symbol: `%2B`.  Using a raw `+` will be treated as a space character and will return an invalid key exception.
+
+#### Non-Existent Keys
+
+Increasing an unset key will result in that key being created with an initial value of the amount to increase by (defaulting to 1); decreasing an unset key will cause that key to be created with an initial value of 0 (zero).
 
 ### Return Values
 

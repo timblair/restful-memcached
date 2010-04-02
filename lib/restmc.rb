@@ -36,6 +36,26 @@ module RESTmc
       end
     end
 
+    put '/+/*' do
+      begin
+        data = request.body.read.to_i
+        by = (data > 0 ? data : 1)
+        @mc.incr splat_to_key(params[:splat]), by
+      rescue Memcached::NotFound
+        @mc.set splat_to_key(params[:splat]), by, get_ttl, false
+      end
+    end
+
+    put '/-/*' do
+      begin
+        data = request.body.read.to_i
+        by = (data > 0 ? data : 1)
+        @mc.decr splat_to_key(params[:splat]), by
+      rescue Memcached::NotFound
+        @mc.set splat_to_key(params[:splat]), 0, get_ttl, false
+      end
+    end
+
     put '/*' do
       @mc.set splat_to_key(params[:splat]), request.body.read, get_ttl, should_marshal?
     end
